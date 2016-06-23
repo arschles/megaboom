@@ -3,11 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"os/exec"
-	"strconv"
 
 	// "k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/client/restclient"
 	kubeclient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
@@ -65,22 +62,12 @@ func main() {
 	if *numPods < 1 {
 		log.Fatalf("There must be at least 1 pod to run")
 	}
-	cmd := exec.Command(
-		"boom",
-		"-n",
-		strconv.Itoa(*numReqs),
-		"-c",
-		strconv.Itoa(*numConcurrent),
-		"-m",
-		*httpMethod,
-		"-t",
-		strconv.Itoa(*timeoutMS),
-	)
 
-	var cfg *restclient.Config
-	kcl, err := kubeclient.New(cfg)
+	kcl, err := kubeclient.NewInCluster()
 	if err != nil {
 		log.Fatalf("Error creating new Kubernetes client (%s)", err)
 	}
+	boomJob := newBoomJob(defaultBoomImage)
+	kcl.Jobs(namespace).Create(boomJob)
 
 }
