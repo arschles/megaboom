@@ -34,6 +34,7 @@ func newBoomJob(boomImage string, boomCmd boomCommand, jobNamespace, jobName str
 					Labels: map[string]string{createdByLabelKey: createdByLabelValue},
 				},
 				Spec: api.PodSpec{
+					RestartPolicy: api.RestartPolicyNever,
 					Containers: []api.Container{
 						api.Container{
 							Image:           boomImage,
