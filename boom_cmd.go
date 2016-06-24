@@ -1,4 +1,4 @@
-package megaboom
+package main
 
 import (
 	"strconv"
