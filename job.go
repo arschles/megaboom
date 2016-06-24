@@ -13,6 +13,7 @@ const (
 	jobKind             = "Job"
 	createdByLabelKey   = "create-by"
 	createdByLabelValue = "megaboom"
+	containerName       = "megaboom"
 )
 
 func newBoomJob(boomImage string, boomCmd boomCommand, jobNamespace, jobName string, parallelism int) *batch.Job {
@@ -37,6 +38,7 @@ func newBoomJob(boomImage string, boomCmd boomCommand, jobNamespace, jobName str
 					RestartPolicy: api.RestartPolicyNever,
 					Containers: []api.Container{
 						api.Container{
+							Name:            containerName,
 							Image:           boomImage,
 							Command:         boomCmd.Slice(),
 							ImagePullPolicy: api.PullAlways,
