@@ -1,6 +1,6 @@
 # megaboom
 
-Megaboom is a Distributed HTTP Load Generator, based on Kubernetes. It is an HTTP server meant to be run inside your Kubernetes cluster, behind a [Service](http://kubernetes.io/docs/user-guide/services/), and it runs [Job](https://github.com/rakyll/boom)s that invocate the [boom](https://github.com/rakyll/boom) CLI to generate load.
+Megaboom is a Distributed HTTP Load Generator, based on Kubernetes. It is an HTTP server meant to be run inside your Kubernetes cluster, behind a [Service](http://kubernetes.io/docs/user-guide/services/), and it runs [Jobs](http://kubernetes.io/docs/user-guide/jobs/) that invocate the [boom](https://github.com/rakyll/boom) CLI to generate load.
 
 # Alpha Status
 This project is still in alpha, and is missing a few major features:
