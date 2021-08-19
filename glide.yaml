@@ -1,6 +1,0 @@
-package: github.com/arschles/megaboom
-import:
-- package: k8s.io/kubernetes
-  subpackages:
-  - pkg/client/restclient
-  - pkg/client/unversioned

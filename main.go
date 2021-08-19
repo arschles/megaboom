@@ -1,21 +1,41 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"fmt"
+	"os"
 
-	kubeclient "k8s.io/kubernetes/pkg/client/unversioned"
+	"github.com/arschles/megaboom/pkg/handlers"
+	"github.com/gin-gonic/gin"
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 func main() {
-	kcl, err := kubeclient.NewInCluster()
+	zapLogger, err := zap.NewDevelopment()
 	if err != nil {
-		log.Fatalf("Error creating new Kubernetes client (%s)", err)
+		fmt.Println("Error creating logger: ", err)
+		os.Exit(1)
 	}
-	mux := http.NewServeMux()
-	mux.Handle("/job", newStartJobHandler(kcl))
-	log.Printf("serving on 8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		log.Fatalf("error serving (%s)", err)
+	lggr := zapr.NewLogger(zapLogger)
+
+	restCfg, err := rest.InClusterConfig()
+	if err != nil {
+		lggr.Error(err, "failed to get in-cluster Kubernetes config")
+		os.Exit(1)
 	}
+
+	kcl, err := kubernetes.NewForConfig(restCfg)
+	if err != nil {
+		lggr.Error(err, "failed to create new kube client")
+		os.Exit(1)
+	}
+
+	r := gin.Default()
+	r.POST("/job", handlers.StartJob(lggr, kcl))
+	r.DELETE("/job/:id", handlers.DeleteJob(lggr, kcl))
+
+	lggr.Info("starting megaboom server", "port", "8080")
+	lggr.Error(r.Run(":8080"), "server failed")
 }

@@ -1,15 +1,16 @@
 # megaboom
 
-Megaboom is a Distributed HTTP Load Generator, based on Kubernetes. It is an HTTP server meant to be run inside your Kubernetes cluster, behind a [Service](http://kubernetes.io/docs/user-guide/services/), and it runs [Jobs](http://kubernetes.io/docs/user-guide/jobs/) that invocate the [boom](https://github.com/rakyll/boom) CLI to generate load.
+Megaboom is a Distributed HTTP Load Generator, based on Kubernetes. It is an HTTP server meant to be run inside your Kubernetes cluster, behind a [Service](http://kubernetes.io/docs/user-guide/services/), and it runs [Jobs](http://kubernetes.io/docs/user-guide/jobs/) that invocate the [hey](https://github.com/rakyll/hey) CLI (formerly called `boom`, hence the name of this repository) to generate load.
 
-# Alpha Status
+## Alpha Status
+
 This project is still in alpha, and is missing a few major features:
 
 - **Reporting the success/failure rate of ongoing jobs** - currently, it's expected that you introspect each [Pod](http://kubernetes.io/docs/user-guide/pods/) to get individual `boom` command output, or use your own monitoring/metrics system to see status of your application under load
 - **Cleaning up after itself** - currently it creates a `megaboom` job in the `default` namespace. You must delete that job before you make the next HTTP request to megaboom. Do the deletion with `kubectl delete job megaboom`
 - **CI infrastructure to run tests and automatically build images** - currently, there are very few tests, and the current Docker image has been manually pushed to `quay.io/arschles/megaboom:devel`
 
-# Usage
+## Usage
 
 This server must run inside a Kubernetes pod. It's recommended that you run this server in a pod managed by a replication controller, and then run a service in front of the replication controller. Kubernetes manifests for doing all of that are not in this repository.
 
