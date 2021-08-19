@@ -12,15 +12,10 @@ This project is still in alpha, and is missing a few major features:
 
 ## Usage
 
-This server must run inside a Kubernetes pod. It's recommended that you run this server in a pod managed by a replication controller, and then run a service in front of the replication controller. Kubernetes manifests for doing all of that are not in this repository.
+This server must run inside a Kubernetes pod. It's recommended that you run this server in a pod managed by a `Deployment`, and then run a service in front of the replication controller. There is a [Helm](https://helm.sh) chart available for you in this repository. Install it with the following command:
 
-The easiest way to achieve all of this functionality is to run megaboom with [Deis Workflow](https://deis.com/docs/workflow).
-
-Assuming you have a Workflow cluster running, and the `deis` CLI tool installed and configured to communicate with that cluster, run these commands to install megaboom:
-
-```console
-deis create --no-remote megaboom
-deis pull quay.io/arschles/megaboom:devel -a megaboom
+```shell
+helm install megaboom -n megaboom ./chart/megaboom
 ```
 
 ## Making Requests to Megaboom

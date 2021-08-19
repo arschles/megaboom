@@ -23,7 +23,7 @@ _testmain.go
 *.test
 *.prof
 vendor
-megaboom
+/megaboom
 rootfs/bin/megaboom
 /bin
 /.envrc
