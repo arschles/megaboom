@@ -1,4 +1,5 @@
-//+build mage
+//go:build mage
+// +build mage
 
 package main
 
@@ -47,6 +48,21 @@ func DockerBuild(ctx context.Context) error {
 		"build",
 		"-t",
 		"ghcr.io/arschles/megaboom:latest",
+		".",
+	)
+}
+
+func DockerBuildACR(ctx context.Context) error {
+	return sh.RunV(
+		"az",
+		"acr",
+		"build",
+		"--image",
+		"megaboom",
+		"--registry",
+		"testingkeda",
+		"--file",
+		"Dockerfile",
 		".",
 	)
 }
