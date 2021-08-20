@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "megaboom.fullname" . }}-alpine
+  labels:
+    {{- include "megaboom.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "megaboom.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "megaboom.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: '{{ include "megaboom.fullname" .}}-debug'
+          image: ubuntu:latest
+          imagePullPolicy: Always
+          stdin: true
+          stdinOnce: true
+          tty: true
