@@ -44,7 +44,7 @@ func main() {
 	}
 
 	r := gin.Default()
-	r.GET("/healthz", func(c *gin.Context) {
+	r.GET("/livez", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
 	r.GET("/readyz", func(c *gin.Context) {

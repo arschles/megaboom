@@ -28,13 +28,14 @@ func StartJob(lggr logr.Logger, jobCreator k8s.JobCreator) gin.HandlerFunc {
 		}
 
 		uid := uuid.New()
-		jobs := k8s.NewJobs(
+		job := k8s.NewJob(
 			uid,
 			req.Endpoint,
+			req.NumRunners,
 			req.NumRequests,
 			req.NumConcurrent,
 		)
-		if err := k8s.CreateJobs(ctx, jobCreator, jobs); err != nil {
+		if err := k8s.CreateJob(ctx, jobCreator, job); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

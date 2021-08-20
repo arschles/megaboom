@@ -28,7 +28,7 @@ Megaboom starts a (simple) HTTP server, which you make requests to via an HTTP c
 Open a shell on the debug pod and run the following `curl` command:
 
 ```shell
-curl -d '{"num_runners": 50, "num_requests": 20000, "num_concurrenc": 2000, "endpoint": "https://gifm.dev", "namespace": "megaboom"}' http://megaboom:8080/job
+curl -d '{"num_runners": 50, "num_requests": 20000, "num_concurrent": 2000, "endpoint": "https://gifm.dev", "namespace": "megaboom"}' http://megaboom:8080/job
 ```
 
 This request will return a Job ID. Copy this down, and use it to delete the job later:
