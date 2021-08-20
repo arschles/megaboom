@@ -33,6 +33,12 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.GET("/healthz", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+	r.GET("/readyz", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
 	r.POST("/job", handlers.StartJob(lggr, kcl))
 	r.DELETE("/job/:id", handlers.DeleteJob(lggr, kcl))
 
