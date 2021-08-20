@@ -23,7 +23,6 @@ helm install megaboom -n megaboom ./chart/megaboom
 Megaboom starts a (simple) HTTP server, which you make requests to via an HTTP client (e.g. `curl`). The helm command in the previous section installs a `megaboom` service in the `megaboom` namespace, and installs a separate "debug pod" to which you can log in and make these requests.
 
 >You can also issue requests to this server using Kubernetes port-forwarding or proxying if you'd like.
-
 >The debug pod does not have `curl` installed by default. The first time you open a shell on it, execute `apt-get update && apt-get install -y curl`. As long as that same pod exists thereafter, you won't need to reinstall `curl`.
 
 Open a shell on the debug pod and run the following `curl` command:

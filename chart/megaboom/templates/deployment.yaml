@@ -23,10 +23,14 @@ spec:
               containerPort: 8080
               protocol: TCP
           livenessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 5
             httpGet:
               path: /livez
               port: http
           readinessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 5
             httpGet:
               path: /readyz
               port: http

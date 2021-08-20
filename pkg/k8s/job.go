@@ -16,14 +16,17 @@ type JobCreator interface {
 	Create(ctx context.Context, job *batchv1.Job, opts metav1.CreateOptions) (*batchv1.Job, error)
 }
 
+type JobDeleter interface {
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+}
+
 func NewJobs(uid uuid.UUID, num uint, endpoint string, totalReqs, concurrentReqs uint) []*batchv1.Job {
-	parallelism := int32(20)
-	completions := int32(20)
-	ret := make([]*batchv1.Job, num)
-	for i := 0; i < int(num); i++ {
-		ret[i] = &batchv1.Job{
+	parallelism := int32(num)
+	completions := int32(num)
+	ret := []*batchv1.Job{
+		&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: jobName(uid, i),
+				Name: jobName(uid, 1),
 				Labels: map[string]string{
 					"created-by": "megaboom",
 				},
@@ -40,7 +43,7 @@ func NewJobs(uid uuid.UUID, num uint, endpoint string, totalReqs, concurrentReqs
 					Spec: corev1.PodSpec{
 						RestartPolicy: corev1.RestartPolicyNever,
 						Containers: []corev1.Container{
-							{
+							corev1.Container{
 								Name:  "megaboom-runner",
 								Image: "ghcr.io/arschles/hey:latest",
 								Command: []string{
@@ -57,7 +60,7 @@ func NewJobs(uid uuid.UUID, num uint, endpoint string, totalReqs, concurrentReqs
 					},
 				},
 			},
-		}
+		},
 	}
 	return ret
 }
@@ -76,6 +79,14 @@ func CreateJobs(
 		})
 	}
 	return g.Wait()
+}
+
+func DeleteJobs(
+	ctx context.Context,
+	cl JobDeleter,
+	uid uuid.UUID,
+) error {
+	return cl.Delete(ctx, jobName(uid, 1), metav1.DeleteOptions{})
 }
 
 func jobName(uid uuid.UUID, jobNum int) string {
