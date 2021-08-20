@@ -8,7 +8,7 @@ This project is still in alpha, and is missing a few major features:
 
 - **Reporting the success/failure rate of ongoing jobs** - currently, it's expected that you introspect each [Pod](http://kubernetes.io/docs/user-guide/pods/) to get individual `boom` command output, or use your own monitoring/metrics system to see status of your application under load
 - **Cleaning up after itself** - currently it creates a `megaboom` job in the `default` namespace. You must delete that job before you make the next HTTP request to megaboom. Do the deletion with `kubectl delete job megaboom`
-- **CI infrastructure to run tests and automatically build images** - currently, there are very few tests, and the current Docker image has been manually pushed to `quay.io/arschles/megaboom:devel`
+- **CI infrastructure to run tests and automatically build images** - currently, there are very few tests, and the current Docker image has not been pushed anywhere. You have to build it yourself and push to your own registry.
 
 ## Usage
 
@@ -20,34 +20,20 @@ helm install megaboom -n megaboom ./chart/megaboom
 
 ## Making Requests to Megaboom
 
-After you have megaboom installed, simply make an HTTP `POST` request to it to start a job. The command below shows how to do this, but it assumes you have the following environment variables set up:
+Megaboom starts a (simple) HTTP server, which you make requests to via an HTTP client (e.g. `curl`). The helm command in the previous section installs a `megaboom` service in the `megaboom` namespace, and installs a separate "debug pod" to which you can log in and make these requests.
 
-- `DEIS_ROUTER_IP` - the IP address of the `deis-router` service. You can get this by executing the `kubectl get svc deis-router --namespace=deis` command
-- `ENDPOINT` - the endpoint for megaboom to make requests against. This is the IP address or DNS name that you'd like to test under load.
-- `TEST_NUM_PODS` - the total number of pods to run in the Kubernetes job
-- `TEST_NUM_CONCURRENT_PER_POD` - the number of concurrent requests to run in a single pod. The global maximum number of requests in flight at once will be `NUM_PODS` * `NUM_CONCURRENT_PER_POD`
-- `TEST_NUM_REQS_PER_POD` - the number of total requests to run in a single pod. The total number of requests to run globally will be `NUM_PODS` * `NUM_REQUESTS_PER_POD`
+>You can also issue requests to this server using Kubernetes port-forwarding or proxying if you'd like.
 
-After you've set up all your environment variables, execute the following command:
+>The debug pod does not have `curl` installed by default. The first time you open a shell on it, execute `apt-get update && apt-get install -y curl`. As long as that same pod exists thereafter, you won't need to reinstall `curl`.
 
-```console
-curl -XPOST -d '{"num_pods": ${TEST_NUM_PODS}, "num_concurrent_per_pod": ${TEST_NUM_CONCURRENT_PER_POD}, "num_reqs_per_pod": ${TEST_NUM_REQS_PER_POD}, "http_method": "GET", "endpoint": "${ENDPOINT}", "namespace": "default", "image": "quay.io/arschles/megaboom:devel"}' http://megaboom.${DEIS_ROUTER_IP}.xip.io
+Open a shell on the debug pod and run the following `curl` command:
+
+```shell
+curl -d '{"num_runners": 50, "num_concurrent_per_runner": 2000, "num_reqs_per_runner": 200000, "endpoint": "https://gifm.dev", "namespace": "megaboom"}' http://megaboom:8080/job
 ```
 
-## Makefile Convenience Target
+This request will return a Job ID. Copy this down, and use it to delete the job later:
 
-Alternatively, there is a build target in the `Makefile` in this repository called `make-live`. This target conveniently can execute the above `curl` command given environment variables similar to the ones above. This target assumes the HTTP server under test is also running in the same Deis Workflow cluster.
-
-Below are the environment variables to use:
-
-- `DEIS_ROUTER_IP` - the IP address of the `deis-router` service. You can get this by executing the `kubectl get svc deis-router --namespace=deis` command
-- `APP_NAME` - the name of the Deis Workflow app to test
-- `TEST_NUM_PODS` - the total number of pods to run in the Kubernetes job
-- `TEST_NUM_CONCURRENT_PER_POD` - the number of concurrent requests to run in a single pod. The global maximum number of requests in flight at once will be `NUM_PODS` * `NUM_CONCURRENT_PER_POD`
-- `TEST_NUM_REQS_PER_POD` - the number of total requests to run in a single pod. The total number of requests to run globally will be `NUM_PODS` * `NUM_REQUESTS_PER_POD`
-
-After you've configured all of these environment variables, simply execute the below command to start the test:
-
-```console
-make test-live
+```shell
+curl -XDELETE http://megaboom:8080/job/<job_id>
 ```
