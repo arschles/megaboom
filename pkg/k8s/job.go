@@ -20,11 +20,11 @@ type JobDeleter interface {
 	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
 }
 
-func NewJobs(uid uuid.UUID, num uint, endpoint string, totalReqs, concurrentReqs uint) []*batchv1.Job {
-	parallelism := int32(num)
-	completions := int32(num)
+func NewJobs(uid uuid.UUID, endpoint string, numPods, numRequests, numConcurrent uint) []*batchv1.Job {
+	parallelism := int32(numPods)
+	completions := int32(numPods)
 	ret := []*batchv1.Job{
-		&batchv1.Job{
+		{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: jobName(uid, 1),
 				Labels: map[string]string{
@@ -43,15 +43,15 @@ func NewJobs(uid uuid.UUID, num uint, endpoint string, totalReqs, concurrentReqs
 					Spec: corev1.PodSpec{
 						RestartPolicy: corev1.RestartPolicyNever,
 						Containers: []corev1.Container{
-							corev1.Container{
+							{
 								Name:  "megaboom-runner",
 								Image: "ghcr.io/arschles/hey:latest",
 								Command: []string{
 									"hey",
 									"-c",
-									strconv.Itoa(int(concurrentReqs)),
+									strconv.Itoa(int(numConcurrent)),
 									"-n",
-									strconv.Itoa(int(totalReqs)),
+									strconv.Itoa(int(numRequests)),
 									endpoint,
 								},
 								ImagePullPolicy: corev1.PullAlways,

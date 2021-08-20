@@ -15,7 +15,7 @@ This project is still in alpha, and is missing a few major features:
 This server must run inside a Kubernetes pod. It's recommended that you run this server in a pod managed by a `Deployment`, and then run a service in front of the replication controller. There is a [Helm](https://helm.sh) chart available for you in this repository. Install it with the following command:
 
 ```shell
-helm install megaboom -n megaboom ./chart/megaboom
+helm install megaboom -n megaboom ./chart/megaboom --create-namespace
 ```
 
 ## Making Requests to Megaboom
@@ -28,7 +28,7 @@ Megaboom starts a (simple) HTTP server, which you make requests to via an HTTP c
 Open a shell on the debug pod and run the following `curl` command:
 
 ```shell
-curl -d '{"num_runners": 50, "num_concurrent_per_runner": 2000, "num_reqs_per_runner": 200000, "endpoint": "https://gifm.dev", "namespace": "megaboom"}' http://megaboom:8080/job
+curl -d '{"num_runners": 50, "num_requests": 20000, "num_concurrenc": 2000, "endpoint": "https://gifm.dev", "namespace": "megaboom"}' http://megaboom:8080/job
 ```
 
 This request will return a Job ID. Copy this down, and use it to delete the job later:

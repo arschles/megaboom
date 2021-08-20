@@ -11,10 +11,10 @@ import (
 
 func StartJob(lggr logr.Logger, jobCreator k8s.JobCreator) gin.HandlerFunc {
 	type reqBody struct {
-		NumRunners             uint   `json:"num_runners"`
-		NumConcurrentPerRunner uint   `json:"num_concurrent_per_runner"`
-		NumReqsPerRunner       uint   `json:"num_reqs_per_runner"`
-		Endpoint               string `json:"endpoint"`
+		NumRunners    uint   `json:"num_runners"`
+		NumRequests   uint   `json:"num_requests"`
+		NumConcurrent uint   `json:"num_concurrent"`
+		Endpoint      string `json:"endpoint"`
 	}
 	type resBody struct {
 		JobID string `json:"job_id"`
@@ -30,10 +30,9 @@ func StartJob(lggr logr.Logger, jobCreator k8s.JobCreator) gin.HandlerFunc {
 		uid := uuid.New()
 		jobs := k8s.NewJobs(
 			uid,
-			req.NumRunners,
 			req.Endpoint,
-			req.NumReqsPerRunner,
-			req.NumConcurrentPerRunner,
+			req.NumRequests,
+			req.NumConcurrent,
 		)
 		if err := k8s.CreateJobs(ctx, jobCreator, jobs); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
