@@ -13,7 +13,7 @@ import (
 
 type result struct {
 	// map from error code to count of that code
-	respCodes map[int]int `json:"response_codes"`
+	RespCodes map[int]int `json:"response_codes"`
 }
 
 func run(
