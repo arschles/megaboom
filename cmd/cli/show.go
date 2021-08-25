@@ -6,6 +6,7 @@ import (
 
 	"github.com/arschles/megaboom/pkg/k8s"
 	"github.com/mitchellh/cli"
+	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -75,11 +76,14 @@ func (s showCommand) Run(args []string) int {
 
 func showCommandFactory(ui cli.Ui) cli.CommandFactory {
 	return func() (cli.Command, error) {
-		fs := newFlagSet("name")
-		cmd := showCommand{ui: ui, fs: fs}
+		cmd := showCommand{ui: ui}
+		fs := newFlagSet(func(fs *pflag.FlagSet) {
+			fmt.Println("RUNNING REG")
+			fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
+			fs.StringVarP(&cmd.name, "name", "n", "", "The name of the load test job")
+		}, "name")
+		cmd.fs = fs
 
-		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
-		fs.fs.StringVarP(&cmd.name, "name", "n", "", "The name of the load test job")
 		// TODO: watch
 		return cmd, nil
 	}

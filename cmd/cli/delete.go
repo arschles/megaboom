@@ -63,10 +63,13 @@ func (s deleteCommand) Run(args []string) int {
 
 func deleteCommandFactory(ui cli.Ui) cli.CommandFactory {
 	return func() (cli.Command, error) {
-		fs := newFlagSet()
-		cmd := deleteCommand{ui: ui, fs: fs}
-		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
-		fs.fs.StringVarP(&cmd.name, "name", "", "", "The name of the load test job to delete")
+		cmd := deleteCommand{ui: ui}
+		fs := newFlagSet(func(fs *pflag.FlagSet) {
+			fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
+			fs.StringVarP(&cmd.name, "name", "", "", "The name of the load test job to delete")
+		})
+		cmd.fs = fs
+
 		return cmd, nil
 	}
 }

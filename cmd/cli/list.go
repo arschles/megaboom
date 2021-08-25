@@ -6,6 +6,7 @@ import (
 
 	"github.com/arschles/megaboom/pkg/k8s"
 	"github.com/mitchellh/cli"
+	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -16,6 +17,7 @@ type listCommand struct {
 }
 
 func (s listCommand) Help() string {
+	s.fs.addFlags(s.fs.fs)
 	return fmt.Sprintf(
 		"Start a load testing job with a specified concurrency, total number of requests, and endpoint. Usage:\n%s",
 		s.fs.fs.FlagUsages(),
@@ -57,9 +59,12 @@ func (s listCommand) Run(args []string) int {
 
 func listCommandFactory(ui cli.Ui) cli.CommandFactory {
 	return func() (cli.Command, error) {
-		fs := newFlagSet()
-		cmd := listCommand{ui: ui, fs: fs}
-		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "namespace to list jobs in")
+		cmd := listCommand{ui: ui}
+		fs := newFlagSet(func(fs *pflag.FlagSet) {
+			fs.StringVarP(&cmd.ns, "namespace", "n", "default", "namespace to list jobs in")
+		})
+		cmd.fs = fs
+
 		return cmd, nil
 	}
 }

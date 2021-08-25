@@ -7,6 +7,7 @@ import (
 	"github.com/arschles/megaboom/pkg/k8s"
 	"github.com/google/uuid"
 	"github.com/mitchellh/cli"
+	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -22,6 +23,7 @@ type startCommand struct {
 }
 
 func (s startCommand) Help() string {
+	s.fs.addFlags(s.fs.fs)
 	return fmt.Sprintf(
 		"Start a load testing job with a specified concurrency, total number of requests, and endpoint. Usage:\n%s",
 		s.fs.fs.FlagUsages(),
@@ -69,14 +71,17 @@ func (s startCommand) Run(args []string) int {
 
 func startCommandFactory(ui cli.Ui) cli.CommandFactory {
 	return func() (cli.Command, error) {
-		fs := newFlagSet("endpoint")
-		cmd := startCommand{ui: ui, fs: fs}
-		fs.fs.StringVarP(&cmd.endpoint, "endpoint", "e", "", "The endpoint to hit")
-		fs.fs.UintVarP(&cmd.reqsPerRunner, "reqs-per-runner", "r", 1, "The number of requests to make per runner")
-		fs.fs.UintVarP(&cmd.concurrency, "concurrency", "c", 1, "The number of concurrent requests to make per runner")
-		fs.fs.UintVarP(&cmd.numRunners, "num-runners", "t", 1, "The total number of runners (pods) to run")
-		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
-		fs.fs.StringSliceVarP(&cmd.headers, "headers", "h", []string{}, "The headers to send with each request")
+		cmd := startCommand{ui: ui}
+		fs := newFlagSet(func(fs *pflag.FlagSet) {
+			fmt.Println("FUYNC")
+			fs.StringVarP(&cmd.endpoint, "endpoint", "e", "", "The endpoint to hit")
+			fs.UintVarP(&cmd.reqsPerRunner, "reqs-per-runner", "r", 1, "The number of requests to make per runner")
+			fs.UintVarP(&cmd.concurrency, "concurrency", "c", 1, "The number of concurrent requests to make per runner")
+			fs.UintVarP(&cmd.numRunners, "num-runners", "t", 1, "The total number of runners (pods) to run")
+			fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
+			fs.StringSliceVarP(&cmd.headers, "headers", "h", []string{}, "The headers to send with each request")
+		}, "endpoint")
+		cmd.fs = fs
 		return cmd, nil
 	}
 }
