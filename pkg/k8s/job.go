@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 	batchv1 "k8s.io/api/batch/v1"
@@ -18,7 +19,15 @@ type JobDeleter interface {
 	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
 }
 
-func NewJob(uid uuid.UUID, endpoint string, numPods, numRequests, numConcurrent uint) *batchv1.Job {
+func NewJob(
+	uid uuid.UUID,
+	endpoint string,
+	numPods,
+	numRequests,
+	numConcurrent uint,
+	headers []string,
+) *batchv1.Job {
+	headersStr := strings.Join(headers, ",")
 	parallelism := int32(numPods)
 	completions := int32(numPods)
 	jb := &batchv1.Job{
@@ -55,8 +64,8 @@ func NewJob(uid uuid.UUID, endpoint string, numPods, numRequests, numConcurrent 
 							ImagePullPolicy: corev1.PullAlways,
 							Env: []corev1.EnvVar{
 								{
-									Name:  "MEGABOOM_UID",
-									Value: uid.String(),
+									Name:  "MEGABOOM_HEADERS",
+									Value: headersStr,
 								},
 							},
 						},

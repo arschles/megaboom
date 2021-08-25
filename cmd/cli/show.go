@@ -6,22 +6,20 @@ import (
 
 	"github.com/arschles/megaboom/pkg/k8s"
 	"github.com/mitchellh/cli"
-	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type showCommand struct {
-	ui            cli.Ui
-	fs            *pflag.FlagSet
-	name          *string
-	ns            *string
-	requiredFlags []string
+	ui   cli.Ui
+	fs   *flagSet
+	name string
+	ns   string
 }
 
 func (s showCommand) Help() string {
 	return fmt.Sprintf(
 		"Show details on a load testing job. Usage:\n%s",
-		s.fs.FlagUsages(),
+		s.fs.fs.FlagUsages(),
 	)
 }
 
@@ -32,7 +30,7 @@ func (s showCommand) Synopsis() string {
 func (s showCommand) Run(args []string) int {
 	ctx := context.Background()
 
-	if err := parseAndValidate(s.fs, s.requiredFlags); err != nil {
+	if err := parseAndValidate(s.fs, args); err != nil {
 		s.ui.Error(err.Error())
 		return 1
 	}
@@ -45,8 +43,8 @@ func (s showCommand) Run(args []string) int {
 
 	// get details about the job and also the config map with reports
 	// (if the job is done)
-	jobGetter := cl.BatchV1().Jobs(*s.ns)
-	job, err := jobGetter.Get(ctx, *s.name, metav1.GetOptions{})
+	jobGetter := cl.BatchV1().Jobs(s.ns)
+	job, err := jobGetter.Get(ctx, s.name, metav1.GetOptions{})
 	if err != nil {
 		s.ui.Error(err.Error())
 		return 1
@@ -76,18 +74,13 @@ func (s showCommand) Run(args []string) int {
 }
 
 func showCommandFactory(ui cli.Ui) cli.CommandFactory {
-	flagSet := pflag.NewFlagSet("megaboom", pflag.ExitOnError)
-	ns := flagSet.StringP("namespace", "n", "default", "The namespace to run the load test in")
-	name := flagSet.StringP("name", "", "", "The name of the load test job to delete")
-	// TODO: watch
-
 	return func() (cli.Command, error) {
-		return showCommand{
-			ui:            ui,
-			fs:            flagSet,
-			name:          name,
-			ns:            ns,
-			requiredFlags: []string{"name"},
-		}, nil
+		fs := newFlagSet("name")
+		cmd := showCommand{ui: ui, fs: fs}
+
+		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
+		fs.fs.StringVarP(&cmd.name, "name", "n", "", "The name of the load test job")
+		// TODO: watch
+		return cmd, nil
 	}
 }

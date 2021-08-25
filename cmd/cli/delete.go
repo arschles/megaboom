@@ -11,11 +11,17 @@ import (
 )
 
 type deleteCommand struct {
-	ui cli.Ui
+	ui   cli.Ui
+	fs   *flagSet
+	ns   string
+	name string
 }
 
 func (s deleteCommand) Help() string {
-	return "Delete a load testing job and its reports"
+	return fmt.Sprintf(
+		"Delete a load testing job and its reports. Usage:\n%s",
+		s.fs.fs.FlagUsages(),
+	)
 }
 
 func (s deleteCommand) Synopsis() string {
@@ -57,6 +63,10 @@ func (s deleteCommand) Run(args []string) int {
 
 func deleteCommandFactory(ui cli.Ui) cli.CommandFactory {
 	return func() (cli.Command, error) {
-		return deleteCommand{ui: ui}, nil
+		fs := newFlagSet()
+		cmd := deleteCommand{ui: ui, fs: fs}
+		fs.fs.StringVarP(&cmd.ns, "namespace", "n", "default", "The namespace to run the load test in")
+		fs.fs.StringVarP(&cmd.name, "name", "", "", "The name of the load test job to delete")
+		return cmd, nil
 	}
 }

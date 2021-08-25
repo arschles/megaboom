@@ -6,11 +6,23 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func parseAndValidate(fs *pflag.FlagSet, args []string, requiredFlags ...string) error {
-	if err := fs.Parse(args); err != nil {
+type flagSet struct {
+	fs       *pflag.FlagSet
+	required []string
+}
+
+func newFlagSet(requiredFields ...string) *flagSet {
+	return &flagSet{
+		fs:       pflag.NewFlagSet("megaboom", pflag.ContinueOnError),
+		required: requiredFields,
+	}
+}
+
+func parseAndValidate(fs *flagSet, args []string) error {
+	if err := fs.fs.Parse(args); err != nil {
 		return err
 	}
-	return requireFlags(fs, requiredFlags...)
+	return requireFlags(fs.fs, fs.required...)
 }
 
 func requireFlags(fs *pflag.FlagSet, flagNames ...string) error {
