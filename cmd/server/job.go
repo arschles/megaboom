@@ -1,13 +1,11 @@
 package main
 
 const (
-	defaultBoomImage    = "quay.io/arschles/boom:0.1.0"
-	defaultJobNamespace = "default"
-	defaultJobName      = "megaboom"
-	jobKind             = "Job"
-	createdByLabelKey   = "create-by"
-	createdByLabelValue = "megaboom"
-	containerName       = "megaboom"
+// defaultJobName      = "megaboom"
+// jobKind             = "Job"
+// createdByLabelKey   = "create-by"
+// createdByLabelValue = "megaboom"
+// containerName       = "megaboom"
 )
 
 // func newBoomJob(boomImage string, boomCmd boomCommand, jobNamespace, jobName string, parallelism int) *batch.Job {

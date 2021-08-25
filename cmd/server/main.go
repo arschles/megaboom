@@ -5,12 +5,11 @@ import (
 	"os"
 
 	"github.com/arschles/megaboom/pkg/handlers"
+	"github.com/arschles/megaboom/pkg/k8s"
 	"github.com/gin-gonic/gin"
 	"github.com/go-logr/zapr"
 	"github.com/kelseyhightower/envconfig"
 	"go.uber.org/zap"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
 type config struct {
@@ -31,13 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	restCfg, err := rest.InClusterConfig()
-	if err != nil {
-		lggr.Error(err, "failed to get in-cluster Kubernetes config")
-		os.Exit(1)
-	}
-
-	kcl, err := kubernetes.NewForConfig(restCfg)
+	kcl, err := k8s.NewK8sClient()
 	if err != nil {
 		lggr.Error(err, "failed to create new kube client")
 		os.Exit(1)
