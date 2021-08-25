@@ -35,7 +35,7 @@ func main() {
 	)
 	defer done()
 	runnerID := uuid.New()
-	kcl, err := k8s.NewK8sClient()
+	kcl, err := k8s.NewClient(true)
 	if err != nil {
 		lggr.Error(
 			err,

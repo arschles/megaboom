@@ -32,31 +32,31 @@ func (Hey) DockerPush(ctx context.Context) error {
 	)
 }
 
-type Server mg.Namespace
+type CLI mg.Namespace
 
-func (Server) Build(ctx context.Context) error {
+func (CLI) Build(ctx context.Context) error {
 	return sh.RunV(
 		"go",
 		"build",
 		"-o",
-		"./bin/megaboom-server",
-		"./cmd/server",
+		"./bin/cli",
+		"./cmd/cli",
 	)
 }
 
-func (Server) DockerBuild(ctx context.Context) error {
+type Worker mg.Namespace
+
+func (Worker) Build(ctx context.Context) error {
 	return sh.RunV(
-		"docker",
+		"go",
 		"build",
-		"-t",
-		"ghcr.io/arschles/megaboom:latest",
-		"-f",
-		"cmd/server/Dockerfile",
-		".",
+		"-o",
+		"./bin/megaboom-worker",
+		"./cmd/worker",
 	)
 }
 
-func (Server) DockerBuildACR(ctx context.Context) error {
+func (Worker) DockerBuildACR(ctx context.Context) error {
 	return sh.RunV(
 		"az",
 		"acr",
@@ -71,22 +71,10 @@ func (Server) DockerBuildACR(ctx context.Context) error {
 	)
 }
 
-func (Server) DockerPush(ctx context.Context) error {
+func (Worker) DockerPush(ctx context.Context) error {
 	return sh.RunV(
 		"docker",
 		"push",
 		"ghcr.io/arschles/megaboom:latest",
-	)
-}
-
-type Worker mg.Namespace
-
-func (Worker) Build(ctx context.Context) error {
-	return sh.RunV(
-		"go",
-		"build",
-		"-o",
-		"./bin/megaboom-worker",
-		"./cmd/worker",
 	)
 }

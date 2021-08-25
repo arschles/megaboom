@@ -11,10 +11,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type JobCreator interface {
-	Create(ctx context.Context, job *batchv1.Job, opts metav1.CreateOptions) (*batchv1.Job, error)
+type JobLister interface {
+	List(ctx context.Context, opts metav1.ListOptions) (*batchv1.JobList, error)
 }
-
 type JobDeleter interface {
 	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
 }
@@ -60,15 +59,6 @@ func NewJob(uid uuid.UUID, endpoint string, numPods, numRequests, numConcurrent 
 			},
 		},
 	}
-}
-
-func CreateJob(
-	ctx context.Context,
-	cl JobCreator,
-	job *batchv1.Job,
-) error {
-	_, err := cl.Create(ctx, job, metav1.CreateOptions{})
-	return err
 }
 
 func DeleteJob(
