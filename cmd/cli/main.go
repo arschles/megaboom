@@ -19,6 +19,7 @@ func main() {
 		"start":  startCommandFactory(&ui),
 		"list":   listCommandFactory(&ui),
 		"delete": deleteCommandFactory(&ui),
+		"show":   showCommandFactory(&ui),
 	}
 
 	exitStatus, err := c.Run()

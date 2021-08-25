@@ -32,6 +32,12 @@ func (s deleteCommand) Run(args []string) int {
 		s.ui.Error(err.Error())
 		return 1
 	}
+
+	if err := requireFlags(flagSet, "name"); err != nil {
+		s.ui.Error(err.Error())
+		return 1
+	}
+
 	cl, err := k8s.NewClient(false)
 	if err != nil {
 		s.ui.Error(err.Error())
