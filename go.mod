@@ -3,7 +3,6 @@ module github.com/arschles/megaboom
 go 1.16
 
 require (
-	github.com/gin-gonic/gin v1.7.4
 	github.com/go-logr/logr v0.4.0
 	github.com/go-logr/zapr v0.2.0
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -11,6 +10,7 @@ require (
 	github.com/googleapis/gnostic v0.5.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/magefile/mage v1.11.0
+	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/cli v1.1.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0 // indirect
